@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة الأدمن - ردود المدعويين</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Amiri', serif;
+      background: #f9e6d4;
+      color: #2a2a2a;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .container { max-width: 820px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 28px; }
+    header h1 { font-size: 30px; color: #866739; font-weight: 700; }
+    header p { color: #454545; font-size: 18px; margin-top: 6px; }
+    .card {
+      background: #fffaf3;
+      border: 1px solid #d8c3a0;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(134, 103, 57, 0.12);
+    }
+
+    /* --- شاشة الدخول --- */
+    .login-screen { display: none; text-align: center; }
+    .login-screen.show { display: block; }
+    .login-screen h2 { color: #866739; font-size: 24px; margin-bottom: 18px; }
+    .login-screen input {
+      width: 100%; max-width: 300px;
+      padding: 12px 16px; font-size: 20px; font-family: 'Amiri', serif;
+      border: 1px solid #ac9778; border-radius: 100px; background: #fff;
+      color: #2a2a2a; text-align: center; outline: none;
+    }
+    .login-screen input:focus { border-color: #866739; }
+    .btn {
+      display: inline-block; margin-top: 14px; padding: 10px 36px;
+      font-size: 19px; font-family: 'Amiri', serif; font-weight: 700;
+      border: none; border-radius: 100px; background: #747B54; color: #fff;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn:hover { background: #60603b; }
+    .btn.danger { background: #b3574a; }
+    .btn.danger:hover { background: #93382c; }
+    .toolbar .btn { margin-top: 0; }
+    .error { color: #a33; font-weight: 700; margin-top: 12px; min-height: 24px; }
+
+    /* --- شاشة الردود --- */
+    .table-screen { display: none; }
+    .table-screen.show { display: block; }
+    .stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px; margin-bottom: 20px;
+    }
+    .stat { background: #f4e8d5; border: 1px solid #d8c3a0; border-radius: 12px; text-align: center; padding: 14px; }
+    .stat b { display: block; font-size: 28px; color: #866739; font-weight: 700; }
+    .stat span { font-size: 16px; color: #454545; }
+    .toolbar { display: flex; gap: 10px; justify-content: space-between; flex-wrap: wrap; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 18px; }
+    th, td { padding: 10px 8px; border-bottom: 1px solid #e6d7bd; text-align: right; }
+    th { color: #866739; font-size: 17px; }
+    td .yes { color: #4c7a3a; font-weight: 700; }
+    td .no  { color: #a33; font-weight: 700; }
+    .del {
+      color: #b3574a; font-weight: 700; cursor: pointer; text-decoration: underline;
+      font-size: 15px; background: none; border: none; font-family: 'Amiri', serif;
+    }
+    .del:hover { color: #93382c; }
+    .empty { text-align: center; color: #454545; padding: 40px 0; font-size: 20px; }
+    .date { font-size: 15px; color: #7a746a; white-space: nowrap; }
+    .msg {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: #2a2a2a; color: #fff; padding: 10px 26px; border-radius: 100px;
+      font-size: 16px; opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 99;
+    }
+    .msg.show { opacity: 1; }
+    @media (max-width: 560px) {
+      table { font-size: 15px; }
+      .date { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🕊️ لوحة الأدمن</h1>
+      <p>ردود المدعويين - تأكيد الحضور</p>
+    </header>
+
+    <div class="card">
+      <!-- شاشة الدخول -->
+      <section id="loginScreen" class="login-screen show">
+        <h2>إدخال كلمة السر</h2>
+        <input id="passwordInput" type="password" placeholder="كلمة السر" autocomplete="current-password" />
+        <div><button class="btn" id="loginBtn">دخول</button></div>
+        <p class="error" id="loginError"></p>
+      </section>
+
+      <!-- شاشة الردود -->
+      <section id="tableScreen" class="table-screen">
+        <div class="stats">
+          <div class="stat"><b id="totalCount">0</b><span>إجمالي الردود</span></div>
+          <div class="stat"><b id="yesCount">0</b><span>سأحضر</span></div>
+          <div class="stat"><b id="noCount">0</b><span>أعتذر</span></div>
+          <div class="stat"><b id="guestsCount">0</b><span>الأفراد المتوقعون حضورًا</span></div>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn" id="refreshBtn">🔄 تحديث</button>
+          <button class="btn danger" id="clearAllBtn">🗑️ حذف الكل</button>
+        </div>
+
+        <div id="listWrap"><table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الاسم</th>
+              <th>المرافقون</th>
+              <th>الحضور</th>
+              <th>التاريخ</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="msg" id="toast"></div>
+<script>
+    const API = '/api/responses';
+    let password = '';
+
+    const $ = (id) => document.getElementById(id);
+    const loginScreen = $('loginScreen');
+    const tableScreen = $('tableScreen');
+    const loginError = $('loginError');
+
+    // ---------- تنبيه صغير ----------
+    let toastTimer;
+    function toast(text) {
+      const t = $('toast');
+      t.textContent = text;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    // ---------- الدخول ----------
+    async function login() {
+      const p = $('passwordInput').value.trim();
+      loginError.textContent = '';
+      if (!p) { loginError.textContent = 'أدخل كلمة السر أولاً'; return; }
+      const res = await fetch(API + '?password=' + encodeURIComponent(p));
+      if (res.status === 401) { loginError.textContent = '❌ كلمة السر غير صحيحة'; return; }
+      if (!res.ok) { loginError.textContent = 'حدث خطأ، حاول مجدداً'; return; }
+      $('passwordInput').value = '';
+      password = p;
+      loginScreen.classList.remove('show');
+      tableScreen.classList.add('show');
+      await load();
+    }
+
+    $('loginBtn').addEventListener('click', login);
+    $('passwordInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
+
+    // ---------- جلب وعرض الردود ----------
+    async function load() {
+      try {
+        const res = await fetch(API + '?password=' + encodeURIComponent(password));
+        if (res.status === 401) { logout('انتهت الجلسة، أعد إدخال كلمة السر'); return; }
+        if (!res.ok) throw new Error();
+        render(await res.json());
+      } catch { toast('تعذر تحميل الردود'); }
+    }
+
+    function render(data) {
+      const yes = data.filter((r) => r.presence).length;
+      const no = data.length - yes;
+      const guests = data.filter((r) => r.presence).reduce((s, r) => s + 1 + Number(r.guests), 0);
+
+      $('totalCount').textContent = data.length;
+      $('yesCount').textContent = yes;
+      $('noCount').textContent = no;
+      $('guestsCount').textContent = guests;
+
+      const rows = $('rows');
+      rows.innerHTML = '';
+
+      if (!data.length) {
+        rows.innerHTML = '<tr><td colspan="6"><div class="empty">لا توجد ردود بعد ⏳</div></td></tr>';
+        return;
+      }
+
+      data.forEach((r, i) => {
+        const d = new Date(r.createdAt);
+        const dateStr = d.toLocaleString('ar-SY', {
+          year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + (i + 1) + '</td>' +
+          '<td><b>' + escapeHtml(r.name) + '</b></td>' +
+          '<td>' + r.guests + '</td>' +
+          '<td>' + (r.presence
+            ? '<span class="yes">نعم، سأحضر</span>'
+            : '<span class="no">أعتذر</span>') + '</td>' +
+          '<td class="date">' + dateStr + '</td>' +
+          '<td><button class="del" data-id="' + r.id + '">حذف</button></td>';
+        rows.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
+    // ---------- حذف ----------
+    $('listWrap').addEventListener('click', async (e) => {
+      const btn = e.target.closest('.del');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      if (!confirm('هل تريد حذف هذا الرد؟')) return;
+      const res = await fetch(API + '/' + id, {
+        method: 'DELETE',
+        headers: { 'x-admin-password': password }
+      });
+      if (res.ok) { toast('تم الحذف'); load(); }
+      else if (res.status === 401) logout();
+      else toast('فشل الحذف');
+    });
+
+    $('clearAllBtn').addEventListener('click', async () => {
+      if (!confirm('هل تريد حذف كل الردود؟ لا يمكن التراجع.')) return;
+      const res = await fetch(API, {
+        method: 'DELETE',
+        headers: { 'x-admin-password': password }
+      });
+      if (res.ok) { toast('تم حذف كل الردود'); load(); }
+      else if (res.status === 401) logout();
+      else toast('فشل الحذف');
+    });
+
+    $('refreshBtn').addEventListener('click', () => load());
+
+    function logout(msg) {
+      password = '';
+      tableScreen.classList.remove('show');
+      loginScreen.classList.add('show');
+      loginError.textContent = msg || '';
+    }
+  </script>
+</body>
+</html>

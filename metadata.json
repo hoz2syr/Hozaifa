@@ -1,0 +1,6 @@
+{
+  "name": "دعوة عقد قران",
+  "description": "صفحة هبوط أنيقة لدعوة عقد قران مع تأكيد الحضور ونظام خرائط وعداد تنازلي.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
