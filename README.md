@@ -44,3 +44,46 @@ View your app in AI Studio: https://ai.studio/apps/42434682-2695-44b3-92e6-5885a
 - زر تحديث، حذف رد واحد، وحذف كل الردود.
 
 > ملاحظة: الردود تُحفظ في ملف **`data/responses.json`** محليًا. هذه حماية بسيطة **ليست آمنة** للبيانات الحساسة.
+
+---
+
+## ☁️ النشر على Cloudflare Pages
+
+المشروع مهيأ للعمل على Cloudflare Pages (استضافة ثابتة) عبر **Cloudflare Pages Functions** — لا حاجة لخادم Express عند النشر.
+
+### 1) الإعدادات الصحيحة في لوحة Cloudflare Pages
+
+| الحقل | القيمة |
+|-------|--------|
+| Framework preset | **Vite** (أو None) |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+| Root directory | (فارغ — جذر المستودع) |
+
+> ❌ لا تستخدم `npx run build` ولا `/` كمسار الإخراج.
+
+### 2) إنشاء ربط KV (التخزين الدائم للردود)
+
+تخزين الردود يتم عبر **Cloudflare KV namespace**:
+
+1. من لوحة Cloudflare: **Workers & Pages → KV → Create a namespace** (مثال اسمه `responses_kv`).
+2. افتح مشروعك: **Settings → Functions → KV namespace bindings → Add binding**.
+3. **Variable name**: `RESPONSES`
+4. **KV namespace**: اختر `responses_kv`.
+
+> ⚠️ بدون ربط KV سيعمل الموقع لكن الردود تُحفظ مؤقتًا في الذاكرة وتُفقد عند إعادة تشغيل الـ Worker.
+
+### 3) رفع التعديلات إلى المستودع
+
+تأكد من رفع الملفات الجديدة إلى GitHub:
+- `functions/api/[[path]].js` ← واجهات `/api/*`
+- `public/admin.html` و `public/_redirects` ← صفحة الأدمن
+- باقي ملفات المشروع
+
+### 4) بعد النشر
+
+- رابط الدعوة: `https://hozaifa.pages.dev`
+- صفحة الأدمن: `https://hozaifa.pages.dev/admin`
+- كلمة السر: **`wedding2026`** (غيّرها من السطر أعلى كل من: ملف `functions/api/[[path]].js` و `server.js`)
+
+> كلمة السر مكتوبة في الكود = حماية بسيطة وليست أمانًا حقيقيًا.
