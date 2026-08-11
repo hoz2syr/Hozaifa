@@ -21,7 +21,7 @@ const PORT = Number(process.env.PORT) || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'responses.json');
 const DIST_DIR = path.join(__dirname, 'dist');
-const ADMIN_FILE = path.join(__dirname, 'public', 'admin.html');
+const ADMIN_FILE = path.join(__dirname, 'public', 'admin', 'index.html');
 
 const app = express();
 app.use(express.json({ limit: '200kb' }));

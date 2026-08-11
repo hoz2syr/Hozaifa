@@ -77,7 +77,7 @@ View your app in AI Studio: https://ai.studio/apps/42434682-2695-44b3-92e6-5885a
 
 تأكد من رفع الملفات الجديدة إلى GitHub:
 - `functions/api/[[path]].js` ← واجهات `/api/*`
-- `public/admin.html` و `public/_redirects` ← صفحة الأدمن
+- `public/admin/index.html` ← صفحة الأدمن (تُخدم مباشرة على `/admin`)
 - باقي ملفات المشروع
 
 ### 4) بعد النشر
